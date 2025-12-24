@@ -27,41 +27,41 @@ type F<T> = fn(T, &dyn Fn(&str));
 #[derive(Copy, Clone)]
 struct Impl {
     name: &'static str,
-    u32: F<u32>,
-    u64: F<u64>,
-    u128: F<u128>,
+    u32: Option<F<u32>>,
+    u64: Option<F<u64>>,
+    u128: Option<F<u128>>,
 }
 
 static IMPLS: &[Impl] = &[
     Impl {
         name: "core",
-        u32: |value, f| {
+        u32: Some(|value, f| {
             let mut buffer = ArrayString::<10>::new();
             write!(buffer, "{value}").unwrap();
             f(&buffer);
-        },
-        u64: |value, f| {
+        }),
+        u64: Some(|value, f| {
             let mut buffer = ArrayString::<20>::new();
             write!(buffer, "{value}").unwrap();
             f(&buffer);
-        },
-        u128: |value, f| {
+        }),
+        u128: Some(|value, f| {
             let mut buffer = ArrayString::<39>::new();
             write!(buffer, "{value}").unwrap();
             f(&buffer);
-        },
+        }),
     },
     Impl {
         name: "itoa",
-        u32: |value, f| f(itoa::Buffer::new().format(value)),
-        u64: |value, f| f(itoa::Buffer::new().format(value)),
-        u128: |value, f| f(itoa::Buffer::new().format(value)),
+        u32: Some(|value, f| f(itoa::Buffer::new().format(value))),
+        u64: Some(|value, f| f(itoa::Buffer::new().format(value))),
+        u128: Some(|value, f| f(itoa::Buffer::new().format(value))),
     },
     Impl {
         name: "null",
-        u32: |_value, f| f(""),
-        u64: |_value, f| f(""),
-        u128: |_value, f| f(""),
+        u32: Some(|_value, f| f("")),
+        u64: Some(|_value, f| f("")),
+        u128: Some(|_value, f| f("")),
     },
 ];
 
@@ -125,9 +125,15 @@ fn main() {
 
     for imp in IMPLS {
         println!("{}", imp.name);
-        measure(&data.u32, imp.u32);
-        measure(&data.u64, imp.u64);
-        measure(&data.u128, imp.u128);
+        if let Some(imp) = imp.u32 {
+            measure(&data.u32, imp);
+        }
+        if let Some(imp) = imp.u64 {
+            measure(&data.u64, imp);
+        }
+        if let Some(imp) = imp.u128 {
+            measure(&data.u128, imp);
+        }
         println!();
     }
 }
