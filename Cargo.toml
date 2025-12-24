@@ -1,0 +1,13 @@
+[package]
+name = "itoa-benchmark"
+version = "0.0.1"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+edition = "2024"
+license = "MIT"
+publish = false
+repository = "https://github.com/dtolnay/itoa-benchmark"
+
+[dependencies]
+arrayvec = "0.7"
+itoa = "1.0.16"
+rand = "0.9"
