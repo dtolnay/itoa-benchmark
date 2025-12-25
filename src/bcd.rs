@@ -14,7 +14,20 @@ fn to_bcd8(abcdefgh: u32) -> u64 {
     a_b_c_d_e_f_g_h
 }
 
-const ZEROS: u64 = 0x30303030_30303030; // 0x30 == '0'
+fn to_bcd16(abcdefghijklmnop: u64) -> u128 {
+    let abcdefghijklmnop = u128::from(abcdefghijklmnop);
+    let abcdefgh_ijklmnop = abcdefghijklmnop
+        + (0x10000000000000000 - 100000000) * ((abcdefghijklmnop * 0xabcc77118461cefd) >> 90);
+    let abcd_efgh_ijkl_mnop = abcdefgh_ijklmnop
+        + (0x100000000 - 10000)
+            * (((abcdefgh_ijklmnop * 0x68db8bb) >> 40) & 0x7fff0000000000007fff);
+    let ab_cd_ef_gh_ij_kl_mn_op = abcd_efgh_ijkl_mnop
+        + (0x10000 - 100) * (((abcd_efgh_ijkl_mnop * 0x147b) >> 19) & 0x7f0000007f0000007f0000007f);
+    let a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p = ab_cd_ef_gh_ij_kl_mn_op
+        + (0x100 - 10)
+            * (((ab_cd_ef_gh_ij_kl_mn_op * 0x67) >> 10) & 0xf000f000f000f000f000f000f000f);
+    a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p
+}
 
 pub fn u64toa_bcd(value: u64, f: &dyn Fn(&str)) {
     if value < 100 {
@@ -28,19 +41,13 @@ pub fn u64toa_bcd(value: u64, f: &dyn Fn(&str)) {
     } else if value < 100_000_000 {
         let bcd = to_bcd8(value as u32);
         let leading_zeros = bcd.leading_zeros() as usize / 8;
-        let bytes = (bcd | ZEROS).to_be_bytes();
+        let bytes = (bcd | 0x30303030_30303030).to_be_bytes();
         f(unsafe { str::from_utf8_unchecked(&bytes[leading_zeros..]) });
     } else if value < 10_000_000_000_000_000 {
-        let bbccddee = (value / 100_000_000) as u32;
-        let ffgghhii = (value % 100_000_000) as u32;
-        let bcd_hi = to_bcd8(bbccddee);
-        let leading_zeros = bcd_hi.leading_zeros() as usize / 8;
-        let bcd_lo = to_bcd8(ffgghhii);
-        let bytes = [
-            (bcd_hi | ZEROS).to_be_bytes(),
-            (bcd_lo | ZEROS).to_be_bytes(),
-        ];
-        f(unsafe { str::from_utf8_unchecked(&bytes.as_flattened()[leading_zeros..]) });
+        let bcd = to_bcd16(value);
+        let leading_zeros = bcd.leading_zeros() as usize / 8;
+        let bytes = (bcd | 0x30303030_30303030_30303030_30303030).to_be_bytes();
+        f(unsafe { str::from_utf8_unchecked(&bytes[leading_zeros..]) });
     } else {
         f(itoa::Buffer::new().format(value));
     }
