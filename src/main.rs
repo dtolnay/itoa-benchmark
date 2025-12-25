@@ -151,6 +151,12 @@ static IMPLS: &[Impl] = &[
         u128: None,
     },
     Impl {
+        name: "tmueller",
+        u32: Some(tmueller::u32toa_tmueller),
+        u64: Some(tmueller::u64toa_tmueller),
+        u128: None,
+    },
+    Impl {
         name: "unnamed",
         u32: None,
         u64: Some(unnamed::u64toa_unnamed),
