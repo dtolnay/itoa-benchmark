@@ -19,19 +19,22 @@ fn to_bcd8(abcdefgh: u32) -> u64 {
 
 const ZEROS: u64 = 0x30303030_30303030; // 0x30 == '0'
 
+#[repr(C, align(8))]
+struct AlignedBuffer([MaybeUninit<u8>; 16]);
+
 pub fn write_significand(value: u64, f: &dyn Fn(&str)) {
-    let mut buffer = [MaybeUninit::<u8>::uninit(); 16];
-    let out = buffer.as_mut_ptr().cast::<u64>();
+    let mut buffer = AlignedBuffer([MaybeUninit::uninit(); 16]);
+    let out = buffer.0.as_mut_ptr().cast::<u64>();
 
     if value < 100_000_000 {
         let bcd = to_bcd8(value as u32);
         let leading_zeros = (bcd | 1).leading_zeros() as usize / 8;
         unsafe {
-            out.write_unaligned(bcd.to_be() | ZEROS);
+            *out = bcd.to_be() | ZEROS;
         }
         f(unsafe {
             str::from_utf8_unchecked(slice::from_raw_parts(
-                buffer.as_ptr().cast::<u8>().add(leading_zeros),
+                buffer.0.as_ptr().cast::<u8>().add(leading_zeros),
                 8 - leading_zeros,
             ))
         });
@@ -41,18 +44,18 @@ pub fn write_significand(value: u64, f: &dyn Fn(&str)) {
         let bcd = to_bcd8(bbccddee);
         let mut leading_zeros = bcd.leading_zeros() as usize / 8;
         unsafe {
-            out.write_unaligned(bcd.to_be() | ZEROS);
+            *out = bcd.to_be() | ZEROS;
         }
         let bcd = to_bcd8(ffgghhii);
         if leading_zeros == 8 {
             leading_zeros += bcd.leading_zeros() as usize / 8;
         }
         unsafe {
-            out.add(1).write_unaligned(bcd.to_be() | ZEROS);
+            *out.add(1) = bcd.to_be() | ZEROS;
         }
         f(unsafe {
             str::from_utf8_unchecked(slice::from_raw_parts(
-                buffer.as_ptr().cast::<u8>().add(leading_zeros),
+                buffer.0.as_ptr().cast::<u8>().add(leading_zeros),
                 16 - leading_zeros,
             ))
         });
