@@ -36,6 +36,21 @@ struct Data {
     u128: [Vec<u128>; 39],
 }
 
+impl Data {
+    fn random() -> Self {
+        let mut rng = SmallRng::seed_from_u64(1);
+        let mut data = Data {
+            u32: [const { Vec::new() }; 10],
+            u64: [const { Vec::new() }; 20],
+            u128: [const { Vec::new() }; 39],
+        };
+        fill(&mut rng, &mut data.u32);
+        fill(&mut rng, &mut data.u64);
+        fill(&mut rng, &mut data.u128);
+        data
+    }
+}
+
 type F<T> = fn(T, &dyn Fn(&str));
 
 #[derive(Copy, Clone)]
@@ -125,17 +140,7 @@ where
 }
 
 fn main() {
-    let mut rng = SmallRng::seed_from_u64(1);
-
-    let mut data = Data {
-        u32: [const { Vec::new() }; 10],
-        u64: [const { Vec::new() }; 20],
-        u128: [const { Vec::new() }; 39],
-    };
-
-    fill(&mut rng, &mut data.u32);
-    fill(&mut rng, &mut data.u64);
-    fill(&mut rng, &mut data.u128);
+    let data = Data::random();
 
     for imp in IMPLS {
         println!("{}", imp.name);
