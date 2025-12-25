@@ -1,6 +1,7 @@
 #![allow(
     clippy::cast_possible_truncation,
     clippy::cast_precision_loss,
+    clippy::many_single_char_names,
     clippy::too_many_lines,
     clippy::unreadable_literal
 )]
