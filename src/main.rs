@@ -10,6 +10,7 @@ mod itoa_ljust_impl;
 mod lut;
 mod mwilson;
 mod naive;
+mod test_all;
 mod tmueller;
 mod unnamed;
 mod unrolledlut;
