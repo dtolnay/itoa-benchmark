@@ -22,17 +22,9 @@ fn to_bcd8(abcdefgh: u32) -> u64 {
 }
 
 pub fn u64toa_bcd(value: u64, f: &dyn Fn(&str)) {
-    if value < 100 {
-        let offset = usize::from(value < 10);
-        f(unsafe {
-            str::from_utf8_unchecked(
-                &crate::digitslut::DIGITS_LUT
-                    [value as usize * 2 + offset..(value as usize + 1) * 2],
-            )
-        });
-    } else if value < 10_000 {
+    if value < 10_000 {
         let bcd = to_bcd4(value as u16);
-        let leading_zeros = bcd.leading_zeros() as usize / 8;
+        let leading_zeros = (bcd | 1).leading_zeros() as usize / 8;
         let bytes = (bcd | 0x30303030).to_be_bytes();
         f(unsafe { str::from_utf8_unchecked(&bytes[leading_zeros..]) });
     } else if value < 100_000_000 {
