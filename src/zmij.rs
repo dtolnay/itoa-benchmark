@@ -14,7 +14,7 @@ fn to_bcd8(abcdefgh: u32) -> u64 {
     let ab_cd_ef_gh = abcd_efgh + (0x10000 - 100) * (((abcd_efgh * 0x147b) >> 19) & 0x7f0000007f);
     let a_b_c_d_e_f_g_h =
         ab_cd_ef_gh + (0x100 - 10) * (((ab_cd_ef_gh * 0x67) >> 10) & 0xf000f000f000f);
-    a_b_c_d_e_f_g_h.to_be()
+    a_b_c_d_e_f_g_h
 }
 
 const ZEROS: u64 = 0x30303030_30303030; // 0x30 == '0'
@@ -25,9 +25,9 @@ pub fn write_significand(value: u64, f: &dyn Fn(&str)) {
 
     if value < 100_000_000 {
         let bcd = to_bcd8(value as u32);
-        let leading_zeros = (bcd | (1 << 56)).trailing_zeros() as usize / 8;
+        let leading_zeros = (bcd | 1).leading_zeros() as usize / 8;
         unsafe {
-            out.write_unaligned(bcd | ZEROS);
+            out.write_unaligned(bcd.to_be() | ZEROS);
         }
         f(unsafe {
             str::from_utf8_unchecked(slice::from_raw_parts(
@@ -39,16 +39,16 @@ pub fn write_significand(value: u64, f: &dyn Fn(&str)) {
         let bbccddee = (value / 100_000_000) as u32;
         let ffgghhii = (value % 100_000_000) as u32;
         let bcd = to_bcd8(bbccddee);
-        let mut leading_zeros = bcd.trailing_zeros() as usize / 8;
+        let mut leading_zeros = bcd.leading_zeros() as usize / 8;
         unsafe {
-            out.write_unaligned(bcd | ZEROS);
+            out.write_unaligned(bcd.to_be() | ZEROS);
         }
         let bcd = to_bcd8(ffgghhii);
         if leading_zeros == 8 {
-            leading_zeros += bcd.trailing_zeros() as usize / 8;
+            leading_zeros += bcd.leading_zeros() as usize / 8;
         }
         unsafe {
-            out.add(1).write_unaligned(bcd | ZEROS);
+            out.add(1).write_unaligned(bcd.to_be() | ZEROS);
         }
         f(unsafe {
             str::from_utf8_unchecked(slice::from_raw_parts(
