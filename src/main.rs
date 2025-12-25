@@ -26,9 +26,9 @@ use std::fmt::Write as _;
 use std::hint;
 use std::time::{Duration, Instant};
 
-const COUNT: usize = 100_000;
-const TRIALS: usize = 8;
-const PASSES: usize = 25;
+const COUNT: usize = if cfg!(miri) { 20 } else { 100_000 };
+const TRIALS: usize = if cfg!(miri) { 1 } else { 8 };
+const PASSES: usize = if cfg!(miri) { 1 } else { 25 };
 
 struct Data {
     u32: [Vec<u32>; 10],
