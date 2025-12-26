@@ -10,7 +10,9 @@
     clippy::unreadable_literal
 )]
 
-mod bcd;
+mod bcd16;
+mod bcd4;
+mod bcd8;
 mod branchlut;
 mod branchlut2;
 mod count;
@@ -148,9 +150,21 @@ static IMPLS: &[Impl] = &[
         u128: None,
     },
     Impl {
-        name: "bcd",
+        name: "bcd4",
         u32: None,
-        u64: Some(bcd::u64toa_bcd),
+        u64: Some(bcd4::u64toa_bcd4),
+        u128: None,
+    },
+    Impl {
+        name: "bcd8",
+        u32: None,
+        u64: Some(bcd8::u64toa_bcd8),
+        u128: None,
+    },
+    Impl {
+        name: "bcd16",
+        u32: None,
+        u64: Some(bcd16::u64toa_bcd16),
         u128: None,
     },
     Impl {

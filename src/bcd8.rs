@@ -16,7 +16,7 @@ fn to_bcd8(abcdefgh: u32) -> u64 {
 
 const ZEROS: u64 = 0x30303030_30303030; // 0x30 == '0'
 
-pub fn u64toa_bcd(value: u64, f: &dyn Fn(&str)) {
+pub fn u64toa_bcd8(value: u64, f: &dyn Fn(&str)) {
     if value < 100 {
         let offset = usize::from(value < 10);
         f(unsafe {
