@@ -37,6 +37,22 @@ pub fn u64toa_bcd4(value: u64, f: &dyn Fn(&str)) {
         ];
         f(unsafe { str::from_utf8_unchecked(&bytes.as_flattened()[leading_zeros..]) });
     } else {
-        f(itoa::Buffer::new().format(value));
+        let top = value / 10_000_000_000_000_000;
+        let hi = (value % 10_000_000_000_000_000 / 100_000_000) as u32;
+        let lo = (value % 100_000_000) as u32;
+        let bcd_top = to_bcd4(top as u16);
+        let bcd_hi_hi = to_bcd4((hi / 10_000) as u16);
+        let bcd_hi_lo = to_bcd4((hi % 10_000) as u16);
+        let bcd_lo_hi = to_bcd4((lo / 10_000) as u16);
+        let bcd_lo_lo = to_bcd4((lo % 10_000) as u16);
+        let leading_zeros = bcd_top.leading_zeros() as usize / 8;
+        let bytes = [
+            (bcd_top | 0x30303030).to_be_bytes(),
+            (bcd_hi_hi | 0x30303030).to_be_bytes(),
+            (bcd_hi_lo | 0x30303030).to_be_bytes(),
+            (bcd_lo_hi | 0x30303030).to_be_bytes(),
+            (bcd_lo_lo | 0x30303030).to_be_bytes(),
+        ];
+        f(unsafe { str::from_utf8_unchecked(&bytes.as_flattened()[leading_zeros..]) });
     }
 }
