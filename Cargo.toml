@@ -5,7 +5,6 @@ authors = ["David Tolnay <dtolnay@gmail.com>"]
 description = "This benchmark evaluates the performance of Rust libraries for rendering fixed-precision integer primitives to ASCII base-10 string"
 edition = "2024"
 license = "MIT"
-publish = false
 repository = "https://github.com/dtolnay/itoa-benchmark"
 
 [dependencies]
