@@ -117,6 +117,7 @@
   xmax=20.9,
   xlabel={digits in u64},
   yticklabel=\empty,
+  set layers,
 ]
   \addplot[color=std] coordinates {
     (1, 19.23)
@@ -190,10 +191,11 @@
   name=u128,
   at=(u64.east),
   anchor=west,
-  xshift=3pt,
+  xshift=6pt,
   xmax=39.9,
   xlabel={digits in u128},
   yticklabel=\empty,
+  set layers,
 ]
   \addplot[color=std] coordinates {
     (1, 19.83)
@@ -322,6 +324,6 @@
 \end{axis}
 \pgfresetboundingbox\path
   (u32.south west) -- ++(-0.4in,-0.39in)
-  rectangle (u128.north east) -- ++(0.05in,0.05in);
+  rectangle (u128.north east) -- ++(9pt,3pt);
 \end{tikzpicture}
 \end{document}
