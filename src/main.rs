@@ -1,3 +1,4 @@
+#![cfg_attr(nightly, feature(int_format_into))]
 #![allow(
     clippy::cast_possible_truncation,
     clippy::cast_precision_loss,
@@ -95,6 +96,13 @@ static IMPLS: &[Impl] = &[
             write!(buffer, "{value}").unwrap();
             f(&buffer);
         }),
+    },
+    #[cfg(nightly)]
+    Impl {
+        name: "NumBuffer",
+        u32: Some(|value, f| f(value.format_into(&mut core::fmt::NumBuffer::new()))),
+        u64: Some(|value, f| f(value.format_into(&mut core::fmt::NumBuffer::new()))),
+        u128: Some(|value, f| f(value.format_into(&mut core::fmt::NumBuffer::new()))),
     },
     Impl {
         name: "itoa",
