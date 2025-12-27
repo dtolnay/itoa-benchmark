@@ -1,4 +1,4 @@
-#![cfg_attr(nightly, feature(int_format_into))]
+#![cfg_attr(int_format_into, feature(int_format_into))]
 #![allow(
     clippy::cast_possible_truncation,
     clippy::cast_precision_loss,
@@ -26,6 +26,8 @@ mod itoa_ljust;
 mod lut;
 mod mwilson;
 mod naive;
+#[cfg(int_format_into)]
+mod numbuffer;
 mod test_all;
 mod tmueller;
 mod unnamed;
@@ -97,12 +99,12 @@ static IMPLS: &[Impl] = &[
             f(&buffer);
         }),
     },
-    #[cfg(nightly)]
+    #[cfg(int_format_into)]
     Impl {
         name: "NumBuffer",
-        u32: Some(|value, f| f(value.format_into(&mut core::fmt::NumBuffer::new()))),
-        u64: Some(|value, f| f(value.format_into(&mut core::fmt::NumBuffer::new()))),
-        u128: Some(|value, f| f(value.format_into(&mut core::fmt::NumBuffer::new()))),
+        u32: Some(numbuffer::u32toa_numbuffer),
+        u64: Some(numbuffer::u64toa_numbuffer),
+        u128: Some(numbuffer::u128toa_numbuffer),
     },
     Impl {
         name: "itoa",
