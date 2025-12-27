@@ -47,6 +47,7 @@ use std::any;
 use std::fmt::Write as _;
 use std::hint;
 use std::time::{Duration, Instant};
+use to_arraystring::ToArrayString as _;
 
 const COUNT: usize = if cfg!(miri) { 20 } else { 100_000 };
 const TRIALS: usize = if cfg!(miri) { 1 } else { 8 };
@@ -114,6 +115,12 @@ static IMPLS: &[Impl] = &[
         u32: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u64: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u128: Some(|value, f| f(itoa::Buffer::new().format(value))),
+    },
+    Impl {
+        name: "to-arraystring",
+        u32: Some(|value, f| f(&value.to_arraystring())),
+        u64: Some(|value, f| f(&value.to_arraystring())),
+        u128: Some(|value, f| f(&value.to_arraystring())),
     },
     Impl {
         name: "null",
