@@ -8,6 +8,7 @@ publish = false
 repository = "https://github.com/dtolnay/itoa-benchmark"
 
 [dependencies]
+anyhow = "1"
 arrayvec = "0.7"
 itoa = "1.0.16"
 paste = "1"

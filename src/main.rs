@@ -12,6 +12,7 @@
     clippy::unreadable_literal
 )]
 
+mod args;
 mod bcd16;
 mod bcd4;
 mod bcd8;
@@ -35,7 +36,9 @@ mod unrolledlut;
 mod unsigned;
 mod yy;
 
+use crate::args::Type;
 use crate::unsigned::Unsigned;
+use anyhow::Result;
 use arrayvec::ArrayString;
 use rand::SeedableRng as _;
 use rand::distr::{Distribution as _, Uniform};
@@ -261,20 +264,21 @@ where
     }
 }
 
-fn main() {
+fn main() -> Result<()> {
     let data = Data::random(COUNT);
+    let mut prev_name = None;
 
-    for imp in IMPLS {
-        println!("{}", imp.name);
-        if let Some(imp) = imp.u32 {
-            measure(&data.u32, imp);
+    for (name, f) in args::parse()? {
+        if prev_name != Some(name) {
+            println!("{newline}{name}", newline = prev_name.map_or("", |_| "\n"));
+            prev_name = Some(name);
         }
-        if let Some(imp) = imp.u64 {
-            measure(&data.u64, imp);
+        match f {
+            Type::U32(f) => measure(&data.u32, f),
+            Type::U64(f) => measure(&data.u64, f),
+            Type::U128(f) => measure(&data.u128, f),
         }
-        if let Some(imp) = imp.u128 {
-            measure(&data.u128, imp);
-        }
-        println!();
     }
+
+    Ok(())
 }
