@@ -39,6 +39,7 @@ mod yy;
 use crate::args::Type;
 use crate::unsigned::Unsigned;
 use anyhow::Result;
+use lexical_core::FormattedSize;
 use arrayvec::ArrayString;
 use rand::SeedableRng as _;
 use rand::distr::{Distribution as _, Uniform};
@@ -115,6 +116,24 @@ static IMPLS: &[Impl] = &[
         u32: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u64: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u128: Some(|value, f| f(itoa::Buffer::new().format(value))),
+    },
+    Impl {
+        name: "lexical",
+        u32: Some(|value, f| {
+            let mut buffer = [0u8; u32::FORMATTED_SIZE_DECIMAL];
+            let bytes = lexical_core::write(value, &mut buffer);
+            f(unsafe { str::from_utf8_unchecked(bytes) });
+        }),
+        u64: Some(|value, f| {
+            let mut buffer = [0u8; u64::FORMATTED_SIZE_DECIMAL];
+            let bytes = lexical_core::write(value, &mut buffer);
+            f(unsafe { str::from_utf8_unchecked(bytes) });
+        }),
+        u128: Some(|value, f| {
+            let mut buffer = [0u8; u128::FORMATTED_SIZE_DECIMAL];
+            let bytes = lexical_core::write(value, &mut buffer);
+            f(unsafe { str::from_utf8_unchecked(bytes) });
+        }),
     },
     Impl {
         name: "to-arraystring",
