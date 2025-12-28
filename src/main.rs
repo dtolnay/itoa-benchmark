@@ -39,7 +39,7 @@ mod yy;
 use crate::args::Type;
 use crate::unsigned::Unsigned;
 use anyhow::Result;
-use arrayvec::ArrayString;
+use arrayvec::{ArrayString, ArrayVec};
 use lexical_core::FormattedSize;
 use rand::SeedableRng as _;
 use rand::distr::{Distribution as _, Uniform};
@@ -116,6 +116,48 @@ static IMPLS: &[Impl] = &[
         u32: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u64: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u128: Some(|value, f| f(itoa::Buffer::new().format(value))),
+    },
+    Impl {
+        name: "itoa04-write",
+        u32: Some(|value, f| {
+            let mut buffer = ArrayVec::<u8, 10>::new();
+            itoa04::write(&mut buffer, value).unwrap();
+            f(unsafe { str::from_utf8_unchecked(buffer.as_slice()) });
+        }),
+        u64: Some(|value, f| {
+            let mut buffer = ArrayVec::<u8, 20>::new();
+            itoa04::write(&mut buffer, value).unwrap();
+            f(unsafe { str::from_utf8_unchecked(buffer.as_slice()) });
+        }),
+        u128: Some(|value, f| {
+            let mut buffer = ArrayVec::<u8, 39>::new();
+            itoa04::write(&mut buffer, value).unwrap();
+            f(unsafe { str::from_utf8_unchecked(buffer.as_slice()) });
+        }),
+    },
+    Impl {
+        name: "itoa04-fmt",
+        u32: Some(|value, f| {
+            let mut buffer = ArrayString::<10>::new();
+            itoa04::fmt(&mut buffer, value).unwrap();
+            f(&buffer);
+        }),
+        u64: Some(|value, f| {
+            let mut buffer = ArrayString::<20>::new();
+            itoa04::fmt(&mut buffer, value).unwrap();
+            f(&buffer);
+        }),
+        u128: Some(|value, f| {
+            let mut buffer = ArrayString::<39>::new();
+            itoa04::fmt(&mut buffer, value).unwrap();
+            f(&buffer);
+        }),
+    },
+    Impl {
+        name: "itoa04-buffer",
+        u32: Some(|value, f| f(itoa04::Buffer::new().format(value))),
+        u64: Some(|value, f| f(itoa04::Buffer::new().format(value))),
+        u128: Some(|value, f| f(itoa04::Buffer::new().format(value))),
     },
     Impl {
         name: "lexical",
