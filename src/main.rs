@@ -39,7 +39,7 @@ mod yy;
 use crate::args::Type;
 use crate::unsigned::Unsigned;
 use anyhow::Result;
-use arrayvec::ArrayString;
+use arrayvec::{ArrayString, ArrayVec};
 use lexical_core::FormattedSize;
 use rand::SeedableRng as _;
 use rand::distr::{Distribution as _, Uniform};
@@ -116,6 +116,24 @@ static IMPLS: &[Impl] = &[
         u32: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u64: Some(|value, f| f(itoa::Buffer::new().format(value))),
         u128: Some(|value, f| f(itoa::Buffer::new().format(value))),
+    },
+    Impl {
+        name: "itoa03",
+        u32: Some(|value, f| {
+            let mut buffer = ArrayVec::<u8, 10>::new();
+            itoa03::write(&mut buffer, value).unwrap();
+            f(unsafe { str::from_utf8_unchecked(buffer.as_slice()) });
+        }),
+        u64: Some(|value, f| {
+            let mut buffer = ArrayVec::<u8, 20>::new();
+            itoa03::write(&mut buffer, value).unwrap();
+            f(unsafe { str::from_utf8_unchecked(buffer.as_slice()) });
+        }),
+        u128: Some(|value, f| {
+            let mut buffer = ArrayVec::<u8, 39>::new();
+            itoa03::write(&mut buffer, value).unwrap();
+            f(unsafe { str::from_utf8_unchecked(buffer.as_slice()) });
+        }),
     },
     Impl {
         name: "lexical",
