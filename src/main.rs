@@ -136,6 +136,12 @@ static IMPLS: &[Impl] = &[
         }),
     },
     Impl {
+        name: "to-str",
+        u32: Some(|value, f| f(to_str::Buffer32::new().format(value))),
+        u64: Some(|value, f| f(to_str::Buffer64::new().format(value))),
+        u128: Some(|value, f| f(to_str::Buffer128::new().format(value))),
+    },
+    Impl {
         name: "to-arraystring",
         u32: Some(|value, f| f(&value.to_arraystring())),
         u64: Some(|value, f| f(&value.to_arraystring())),
