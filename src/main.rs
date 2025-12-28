@@ -47,6 +47,8 @@ use rand::rngs::SmallRng;
 use std::any;
 use std::fmt::Write as _;
 use std::hint;
+use std::mem::MaybeUninit;
+use std::slice;
 use std::time::{Duration, Instant};
 use to_arraystring::ToArrayString as _;
 
@@ -133,6 +135,39 @@ static IMPLS: &[Impl] = &[
             let mut buffer = [0u8; u128::FORMATTED_SIZE_DECIMAL];
             let bytes = lexical_core::write(value, &mut buffer);
             f(unsafe { str::from_utf8_unchecked(bytes) });
+        }),
+    },
+    Impl {
+        name: "itoap",
+        u32: Some(|value, f| {
+            let mut buffer = [MaybeUninit::<u8>::uninit(); <u32 as itoap::Integer>::MAX_LEN];
+            unsafe {
+                let len = itoap::write_to_ptr(buffer.as_mut_ptr().cast::<u8>(), value);
+                f(str::from_utf8_unchecked(slice::from_raw_parts(
+                    buffer.as_ptr().cast::<u8>(),
+                    len,
+                )));
+            }
+        }),
+        u64: Some(|value, f| {
+            let mut buffer = [MaybeUninit::<u8>::uninit(); <u64 as itoap::Integer>::MAX_LEN];
+            unsafe {
+                let len = itoap::write_to_ptr(buffer.as_mut_ptr().cast::<u8>(), value);
+                f(str::from_utf8_unchecked(slice::from_raw_parts(
+                    buffer.as_ptr().cast::<u8>(),
+                    len,
+                )));
+            }
+        }),
+        u128: Some(|value, f| {
+            let mut buffer = [MaybeUninit::<u8>::uninit(); <u128 as itoap::Integer>::MAX_LEN];
+            unsafe {
+                let len = itoap::write_to_ptr(buffer.as_mut_ptr().cast::<u8>(), value);
+                f(str::from_utf8_unchecked(slice::from_raw_parts(
+                    buffer.as_ptr().cast::<u8>(),
+                    len,
+                )));
+            }
         }),
     },
     Impl {
