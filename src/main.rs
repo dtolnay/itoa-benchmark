@@ -41,6 +41,7 @@ use crate::unsigned::Unsigned;
 use anyhow::Result;
 use arrayvec::ArrayString;
 use lexical_core::FormattedSize;
+use pretty_toa::ThousandsSep as _;
 use rand::SeedableRng as _;
 use rand::distr::{Distribution as _, Uniform};
 use rand::rngs::SmallRng;
@@ -134,6 +135,12 @@ static IMPLS: &[Impl] = &[
             let bytes = lexical_core::write(value, &mut buffer);
             f(unsafe { str::from_utf8_unchecked(bytes) });
         }),
+    },
+    Impl {
+        name: "pretty_toa",
+        u32: Some(|value, f| f(&value.thousands_sep())),
+        u64: Some(|value, f| f(&value.thousands_sep())),
+        u128: None,
     },
     Impl {
         name: "to-arraystring",
