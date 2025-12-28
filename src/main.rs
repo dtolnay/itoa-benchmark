@@ -86,7 +86,7 @@ struct Impl {
 
 static IMPLS: &[Impl] = &[
     Impl {
-        name: "core",
+        name: "write",
         u32: Some(|value, f| {
             let mut buffer = ArrayString::<10>::new();
             write!(buffer, "{value}").unwrap();
@@ -102,6 +102,12 @@ static IMPLS: &[Impl] = &[
             write!(buffer, "{value}").unwrap();
             f(&buffer);
         }),
+    },
+    Impl {
+        name: "to_string",
+        u32: Some(|value, f| f(&value.to_string())),
+        u64: Some(|value, f| f(&value.to_string())),
+        u128: Some(|value, f| f(&value.to_string())),
     },
     #[cfg(int_format_into)]
     Impl {
