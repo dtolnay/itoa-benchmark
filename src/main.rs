@@ -136,6 +136,12 @@ static IMPLS: &[Impl] = &[
         }),
     },
     Impl {
+        name: "numtoa",
+        u32: Some(|value, f| f(numtoa::numtoa_u32_str(value, 10, &mut [0u8; 10]))),
+        u64: Some(|value, f| f(numtoa::numtoa_u64_str(value, 10, &mut [0u8; 20]))),
+        u128: Some(|value, f| f(numtoa::numtoa_u128_str(value, 10, &mut [0u8; 39]))),
+    },
+    Impl {
         name: "to-arraystring",
         u32: Some(|value, f| f(&value.to_arraystring())),
         u64: Some(|value, f| f(&value.to_arraystring())),
