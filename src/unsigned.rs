@@ -1,10 +1,12 @@
 use rand::distr::uniform::SampleUniform;
 use std::ops::Sub;
 
-pub(crate) trait Unsigned: Copy + SampleUniform + From<bool> + Sub<Output = Self> {
+pub(crate) trait Unsigned:
+    Copy + SampleUniform + From<bool> + Sub<Output = Self> + PartialOrd
+{
     const ONE: Self;
     const TEN: Self;
-    fn pow(self, exp: u32) -> Self;
+    const MAX: Self;
     fn saturating_pow(self, exp: u32) -> Self;
     fn wrapping_add(self, rhs: Self) -> Self;
     fn wrapping_sub(self, rhs: Self) -> Self;
@@ -16,9 +18,7 @@ macro_rules! impl_unsigned {
         impl Unsigned for $T {
             const ONE: Self = 1;
             const TEN: Self = 10;
-            fn pow(self, exp: u32) -> Self {
-                self.pow(exp)
-            }
+            const MAX: Self = Self::MAX;
             fn saturating_pow(self, exp: u32) -> Self {
                 self.saturating_pow(exp)
             }

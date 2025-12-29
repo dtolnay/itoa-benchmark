@@ -42,7 +42,8 @@ where
     T: Unsigned,
 {
     assert!(len >= 1);
-    let lo = T::TEN.pow(len as u32 - 1) - T::from(len == 1);
+    let lo = T::TEN.saturating_pow(len as u32 - 1) - T::from(len == 1);
+    assert!(lo != T::MAX);
     let hi = T::TEN
         .saturating_pow(len as u32)
         .wrapping_add(T::ONE)
