@@ -256,7 +256,7 @@ where
             .wrapping_add(T::ONE)
             .saturating_sub(T::ONE)
             .wrapping_sub(T::ONE);
-        let distr = Uniform::try_from(lo..=hi).unwrap();
+        let distr = Uniform::new_inclusive(lo, hi).unwrap();
         vec.reserve_exact(count);
         for _ in 0..count {
             vec.push(distr.sample(rng));
