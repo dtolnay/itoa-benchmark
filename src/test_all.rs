@@ -1,16 +1,16 @@
 #![cfg(test)]
 
-use crate::{Data, F, Impl, Unsigned};
+use crate::{Data, DataForType, F, Impl, Unsigned};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 const COUNT: usize = if cfg!(miri) { 10 } else { 1000 };
 
-fn verify<T, const N: usize>(core: &Impl, data: &[Vec<T>; N], get: fn(&Impl) -> Option<F<T>>)
+fn verify<T, const N: usize>(core: &Impl, data: &DataForType<T, N>, get: fn(&Impl) -> Option<F<T>>)
 where
     T: Unsigned,
 {
     let core = get(core).unwrap();
-    for vec in data {
+    for vec in &data.by_length {
         for &value in vec {
             core(value, &|expected| {
                 for imp in crate::IMPLS {
@@ -42,7 +42,7 @@ fn test_all() {
     }
 
     let core = core.unwrap();
-    let data = Data::random(COUNT);
+    let data = Data::random(COUNT, false);
     verify(core, &data.u32, |imp| imp.u32);
     verify(core, &data.u64, |imp| imp.u64);
     verify(core, &data.u128, |imp| imp.u128);
