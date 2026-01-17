@@ -18,7 +18,7 @@ Build and run the benchmark yourself using `cargo run --release`.
 
 ## Results
 
-The following results are measured on a 2018 AMD Ryzen Threadripper 2990WX using
+The following results are measured on a 2025 AMD Ryzen Threadripper 9975WX using
 Rust 1.92.0.
 
 ![performance](https://raw.githubusercontent.com/dtolnay/itoa-benchmark/master/performance.png)
