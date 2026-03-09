@@ -150,11 +150,7 @@ static IMPLS: &[Impl] = &[
             let len = unsafe { itoaaa::unchecked_write_to_slice(value, &mut buffer) };
             f(unsafe { str::from_utf8_unchecked(slice::from_raw_parts(buffer.as_ptr(), len)) });
         }),
-        u128: Some(|value, f| {
-            let mut buffer = [0u8; 39];
-            let len = unsafe { itoaaa::unchecked_write_to_slice(value, &mut buffer) };
-            f(unsafe { str::from_utf8_unchecked(slice::from_raw_parts(buffer.as_ptr(), len)) });
-        }),
+        u128: None,
     },
     Impl {
         name: "null",
