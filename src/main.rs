@@ -46,6 +46,7 @@ use lexical_core::FormattedSize;
 use std::any;
 use std::fmt::Write as _;
 use std::hint;
+use std::slice;
 use std::time::{Duration, Instant};
 use to_arraystring::ToArrayString as _;
 
@@ -118,6 +119,24 @@ static IMPLS: &[Impl] = &[
         u32: Some(|value, f| f(&value.to_arraystring())),
         u64: Some(|value, f| f(&value.to_arraystring())),
         u128: Some(|value, f| f(&value.to_arraystring())),
+    },
+    Impl {
+        name: "itoap",
+        u32: Some(|value, f| {
+            let mut buffer = [0u8; <u32 as itoap::Integer>::MAX_LEN];
+            let len = unsafe { itoap::write_to_ptr(buffer.as_mut_ptr(), value) };
+            f(unsafe { str::from_utf8_unchecked(slice::from_raw_parts(buffer.as_ptr(), len)) });
+        }),
+        u64: Some(|value, f| {
+            let mut buffer = [0u8; <u64 as itoap::Integer>::MAX_LEN];
+            let len = unsafe { itoap::write_to_ptr(buffer.as_mut_ptr(), value) };
+            f(unsafe { str::from_utf8_unchecked(slice::from_raw_parts(buffer.as_ptr(), len)) });
+        }),
+        u128: Some(|value, f| {
+            let mut buffer = [0u8; <u128 as itoap::Integer>::MAX_LEN];
+            let len = unsafe { itoap::write_to_ptr(buffer.as_mut_ptr(), value) };
+            f(unsafe { str::from_utf8_unchecked(slice::from_raw_parts(buffer.as_ptr(), len)) });
+        }),
     },
     Impl {
         name: "null",
